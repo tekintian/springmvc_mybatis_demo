@@ -1,33 +1,36 @@
 # SpringMVC 注释总结 与使用对比
 
 ## @Controller
-	用于标记在一个类上，使用它标记的类就是一个SpringMVC Controller 对象。分发处理器将会扫描使用了该注解的类的方法。通俗来说，被Controller标记的类就是一个控制器，这个类中的方法，就是相应的动作。
+用于标记在一个类上，使用它标记的类就是一个SpringMVC Controller 对象。分发处理器将会扫描使用了该注解的类的方法。通俗来说，被Controller标记的类就是一个控制器，这个类中的方法，就是相应的动作。
 
 ## @RequestMapping
-	是一个用来处理请求地址映射的注解，可用于类或方法上。用于类上，表示类中的所有响应请求的方法都是以该地址作为父路径。
+
+是一个用来处理请求地址映射的注解，可用于类或方法上。用于类上，表示类中的所有响应请求的方法都是以该地址作为父路径。
 
 ## @Service
-	用来标记 Service 类, 
-	例：@Service("userService")注解是告诉Spring，当Spring要创建UserServiceImpl的的实例时，bean的名字必须叫做"userService"，这样当Action需要使用UserServiceImpl的的实例时,就可以由Spring创建好的"userService"，然后注入给Action。
+用来标记 Service 类, 
+例：@Service("userService")注解是告诉Spring，当Spring要创建UserServiceImpl的的实例时，bean的名字必须叫做"userService"，这样当Action需要使用UserServiceImpl的的实例时,就可以由Spring创建好的"userService"，然后注入给Action。
 
 ## @Repository
-	DAO层的标记注释，
-	如：@Repository(value="userDao")注解是告诉Spring，让Spring创建一个名字叫“userDao”的UserDaoImpl实例。
-	当Service需要使用Spring创建的名字叫“userDao”的UserDaoImpl实例时，就可以使用@Resource(name = "userDao")注解告诉Spring，Spring把创建好的userDao注入给Service即可。
+DAO层的标记注释，
+如：@Repository(value="userDao")注解是告诉Spring，让Spring创建一个名字叫“userDao”的UserDaoImpl实例。
+当Service需要使用Spring创建的名字叫“userDao”的UserDaoImpl实例时，就可以使用@Resource(name = "userDao")注解告诉Spring，Spring把创建好的userDao注入给Service即可。
 	
 ## @Component
-	mapper层 的标注。
+mapper层 的标注。
 
 ## @Transactional
-    事务管理 控制标注
+事务管理 控制标注
 
 ## @Autowired
-	自动装配标注，@Autowired可以对成员变量、方法和构造函数进行标注，来完成自动装配的工作，我们也要清楚，@Autowired是根据类型进行自动装配的。
+自动装配标注，@Autowired可以对成员变量、方法和构造函数进行标注，来完成自动装配的工作，我们也要清楚，@Autowired是根据类型进行自动装配的。
 
 ## @Resource
-	@Resource的作用相当于@Autowired，只不过@Autowired按byType自动注入，而@Resource默认按 byName自动注入罢了。
-     @Resource有两个属性是比较重要的，分别是name和type，spring将@Resource注解的name属性解析为bean的名字，而type属性则解析为bean的类型。所以如果使用name属性，则使用byName的自动注入策略，而使用type属性时则使用byType自动注入策略。如果既不指定name也不指定type属性，这时将通过反射机制使用byName自动注入策略。
- @Resource装配顺序
+@Resource的作用相当于@Autowired，只不过@Autowired按byType自动注入，而@Resource默认按 byName自动注入罢了。
+
+@Resource有两个属性是比较重要的，分别是name和type，spring将@Resource注解的name属性解析为bean的名字，而type属性则解析为bean的类型。所以如果使用name属性，则使用byName的自动注入策略，而使用type属性时则使用byType自动注入策略。如果既不指定name也不指定type属性，这时将通过反射机制使用byName自动注入策略。
+
+- @Resource装配顺序
 1. 如果同时指定了name和type，则从Spring上下文中找到唯一匹配的bean进行装配，找不到则抛出异常。
 2. 如果指定了name，则从上下文中查找名称（id匹配的bean进行装配，找不到则抛出异常。
 3. 如果指定了type，则从上下文中找到类型匹配的唯一bean进行装配，找不到或者找到多个，都会抛出异常。
@@ -57,20 +60,20 @@ private IuserService userService;
      private LoginService loginService;
 ```
 
-### 两个的区别：  
-    (1).@Autowired 与@Resource都可以用来装配bean. 都可以写在字段上,或写在setter方法上;
-    (2).@Autowired 默认按类型装配，默认情况下必须要求依赖对象必须存在，如果要允许null值，可以设
-    置它的required属性为false，如：@Autowired(required=false) .
-如果我们想使用名称装配可以结合 @Qualifier注解进行使用;
-    (3).@Resource（这个注解属于J2EE的），默认安装名称进行装配，名称可以通过name属性进行指定，如果没
-     有指定name属性，当注解写在字段上时，默认取字段名进行安装名称查找，如果注解写在setter方法上默认取属
-     性名进行装配。当找不到与名称匹配的bean时才按照类型进行装 配。但是需要注意的是，如果name属性一旦指
-     定，就只会按照名称进行装配。
+### 两个的区别：
+  
+(1).@Autowired 与@Resource都可以用来装配bean. 都可以写在字段上,或写在setter方法上;
 
+(2).@Autowired 默认按类型装配，默认情况下必须要求依赖对象必须存在，如果要允许null值，可以设
+置它的required属性为false，如：@Autowired(required=false) .
+如果我们想使用名称装配可以结合 @Qualifier注解进行使用;
+
+(3).@Resource（这个注解属于J2EE的），默认安装名称进行装配，名称可以通过name属性进行指定，如果没有指定name属性，当注解写在字段上时，默认取字段名进行安装名称查找，如果注解写在setter方法上默认取属性名进行装配。当找不到与名称匹配的bean时才按照类型进行装 配。但是需要注意的是，如果name属性一旦指定，就只会按照名称进行装配。
 
 ## 总结
 
-	@Controller 用于标记在一个类上，使用它标记的类就是一个SpringMVC Controller 对象。分发处理器将会扫描使用了该注解的类的方法。通俗来说，被Controller标记的类就是一个控制器，这个类中的方法，就是相应的动作。
+
+@Controller 用于标记在一个类上，使用它标记的类就是一个SpringMVC Controller 对象。分发处理器将会扫描使用了该注解的类的方法。通俗来说，被Controller标记的类就是一个控制器，这个类中的方法，就是相应的动作。
 
 1. @controller 控制器（注入服务）
 2. @service 服务（注入dao）
@@ -225,7 +228,8 @@ public class Main {
 在Man接口前面标上@Autowired和@Qualifier注释使得Man接口可以被容器注入，当Man接口存在两个实现类的时候必须指定其中一个来注入，使用实现类首字母小写的字符串来注入。否则可以省略，只写@Autowired
 注释配置相对于 XML 配置具有很多的优势： 
  
-    它可以充分利用 Java 的反射机制获取类结构信息，这些信息可以有效减少配置的工作。如使用 JPA 注释配置 ORM 映射时，我们就不需要指定 PO 的属性名、类型等信息，如果关系表字段和 PO 属性名、类型都一致，您甚至无需编写任务属性映射信息——因为这些信息都可以通过 Java 反射机制获取。  
+
+它可以充分利用 Java 的反射机制获取类结构信息，这些信息可以有效减少配置的工作。如使用 JPA 注释配置 ORM 映射时，我们就不需要指定 PO 的属性名、类型等信息，如果关系表字段和 PO 属性名、类型都一致，您甚至无需编写任务属性映射信息——因为这些信息都可以通过 Java 反射机制获取。  
      
  注释和 Java 代码位于一个文件中，而 XML 配置采用独立的配置文件，大多数配置信息在程序开发完成后都不会调整，如果配置信息和 Java 代码放在一起，有助于增强程序的内聚性。而采用独立的 XML 配置文件，程序员在编写一个功能时，往往需要在程序文件和配置文件中不停切换，这种思维上的不连贯会降低开发效率。   
  因此在很多情况下，注释配置比 XML 配置更受欢迎，注释配置有进一步流行的趋势。Spring 2.5 的一大增强就是引入了很多注释类，现在您已经可以使用注释配置完成大部分 XML 配置的功能。在这篇文章里，我们将向您讲述使用注释进行 Bean 定义和依赖注入的内容。
