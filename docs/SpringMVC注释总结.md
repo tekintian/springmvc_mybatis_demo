@@ -18,6 +18,9 @@
 ## @Component
 	mapper层 的标注。
 
+## @Transactional
+    事务管理 控制标注
+
 ## @Autowired
 	自动装配标注，@Autowired可以对成员变量、方法和构造函数进行标注，来完成自动装配的工作，我们也要清楚，@Autowired是根据类型进行自动装配的。
 
@@ -669,3 +672,51 @@ package cn.tekin;
 ### 小结  
 
   Spring 在 2.1 以后对注释配置提供了强力的支持，注释配置功能成为 Spring 2.5 的最大的亮点之一。合理地使用 Spring 2.5 的注释配置，可以有效减少配置的工作量，提高程序的内聚性。但是这并不意味着传统 XML 配置将走向消亡，在第三方类 Bean 的配置，以及那些诸如数据源、缓存池、持久层操作模板类、事务管理等内容的配置上，XML 配置依然拥有不可替代的地位。
+
+
+##  @Transactional 使用详解
+
+### @Transactional之value
+
+    value这里主要用来指定不同的事务管理器；主要用来满足在同一个系统中，存在不同的事务管理器。比如在Spring中，声明了两种事务管理器txManager1, txManager2.
+
+然后，用户可以根据这个参数来根据需要指定特定的txManager.
+
+   那有同学会问什么情况下会存在多个事务管理器的情况呢？ 比如在一个系统中，需要访问多个数据源或者多个数据库，则必然会配置多个事务管理器的。
+
+###  @Transactional之propagation
+
+      Propagation支持7种不同的传播机制：
+
+ - REQUIRED
+    业务方法需要在一个事务中运行,如果方法运行时,已处在一个事务中,那么就加入该事务,否则自己创建一个新的事务.这是spring默认的传播行为.。 
+ 
+  - SUPPORTS： 
+    如果业务方法在某个事务范围内被调用,则方法成为该事务的一部分,如果业务方法在事务范围外被调用,则方法在没有事务的环境下执行。
+    
+  - MANDATORY：
+    只能在一个已存在事务中执行,业务方法不能发起自己的事务,如果业务方法在没有事务的环境下调用,就抛异常
+ - REQUIRES_NEW
+             业务方法总是会为自己发起一个新的事务,如果方法已运行在一个事务中,则原有事务被挂起,新的事务被创建,直到方法结束,新事务才结束,原先的事务才会恢复执行.
+  - NOT_SUPPORTED
+           声明方法需要事务,如果方法没有关联到一个事务,容器不会为它开启事务.如果方法在一个事务中被调用,该事务会被挂起,在方法调用结束后,原先的事务便会恢复执行.
+ - NEVER：
+              声明方法绝对不能在事务范围内执行,如果方法在某个事务范围内执行,容器就抛异常.只有没关联到事务,才正常执行.
+ -  NESTED：
+          如果一个活动的事务存在,则运行在一个嵌套的事务中.如果没有活动的事务,则按 - REQUIRED属性执行.它使用了一个单独的事务, 这个事务拥有多个可以回滚的保证点.内部事务回滚不会对外部事务造成影响, 它只对DataSourceTransactionManager 事务管理器起效.
+
+     其实大家最感到困惑的是REQUIRED_NEW和NESTED两种不同的传播机制，功能类似，都涉及到了事务嵌套的问题，那两者有何区别呢？该如何正确使用这两种模式呢？
+
+以下是摘自Spring的文档：
+
+PROPAGATION_REQUIRES_NEW : uses a completely independent transaction for each affected transaction scope. In that case, the underlying physical transactions are different and hence can commit or roll back independently, with an outer transaction not affected by an inner transaction's rollback status.
+
+
+内部的事务独立运行，在各自的作用域中，可以独立的回滚或者提交；而外部的事务将不受内部事务的回滚状态影响。 
+
+ROPAGATION_NESTED : uses a single physical transaction with multiple savepoints that it can roll back to. Such partial rollbacks allow an inner transaction scope to trigger a rollback for its scope, with the outer transaction being able to continue the physical transaction despite some operations having been rolled back. This setting is typically mapped onto JDBC savepoints, so will only work with JDBC resource transactions.
+
+NESTED的事务，基于单一的事务来管理，提供了多个保存点。这种多个保存点的机制允许内部事务的变更触发外部事务的回滚。而外部事务在混滚之后，仍能继续进行事务处理，即使部分操作已经被混滚。 由于这个设置基于JDBC的保存点，所以只能工作在JDBC的机制智商。
+
+由此可知， 两者都是事务嵌套，不同之处在于，内外事务之间是否存在彼此之间的影响；NESTED之间会受到影响，而产生部分回滚，而REQUIRED_NEW则是独立的。
+
